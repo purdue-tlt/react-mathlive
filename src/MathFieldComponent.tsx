@@ -18,6 +18,8 @@ export interface Props {
      * The mathfield object returned by makeMathField.
      */
     mathFieldRef?: (mathfield: MathField) => void;
+
+    suppressChangeNotifications?: boolean;
 }
 
 /** A react-control that hosts a mathlive-mathfield in it. */
@@ -33,7 +35,7 @@ export class MathFieldComponent extends React.Component<Props> {
             ...props.mathFieldOptions
         };
 
-        const { onChange, onBlur, onKeystroke } = this.props;
+        const { onChange, onBlur, onKeystroke } = props;
 
         if (onChange) {
             if (props.mathFieldOptions && props.mathFieldOptions.onContentDidChange) {
@@ -81,7 +83,11 @@ export class MathFieldComponent extends React.Component<Props> {
         }
 
         if (newProps.latex !== this.props.latex) {
-            this.mathField.$latex(newProps.latex, { suppressChangeNotifications: true });
+            this.mathField.$latex(newProps.latex, { 
+                suppressChangeNotifications: this.props.suppressChangeNotifications === undefined 
+                    ? true 
+                    : this.props.suppressChangeNotifications 
+            });
         }
     }
 
@@ -98,7 +104,11 @@ export class MathFieldComponent extends React.Component<Props> {
         }
         
         this.mathField = makeMathField(this.insertElement, this.combinedOptions);
-        this.mathField.$latex(this.props.latex, { suppressChangeNotifications: true });
+        this.mathField.$latex(this.props.latex, { 
+            suppressChangeNotifications: this.props.suppressChangeNotifications === undefined 
+                ? true 
+                : this.props.suppressChangeNotifications 
+        });
 
         if (this.props.mathFieldRef) {
             this.props.mathFieldRef(this.mathField);
